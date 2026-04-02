@@ -162,9 +162,20 @@ def get_client(t) -> Client:
         clean_token = token.replace('OAuth ', '').strip().strip('"').strip("'")
         if ":" in clean_token and len(clean_token) > 50: # Likely a Session_id
             print(f"{Fore.CYAN}[Wait] Attempting to exchange Session_id for Token...")
-            r = requests.get('https://music.yandex.ru/api/v2.1/token', cookies={'Session_id': clean_token})
+            headers = {
+                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36",
+                "Referer": "https://music.yandex.ru/"
+            }
+            r = requests.get('https://music.yandex.ru/api/v2.1/token', cookies={'Session_id': clean_token}, headers=headers)
             if r.status_code == 200:
-                clean_token = r.json().get('token', clean_token)
+                res_json = r.json()
+                if 'token' in res_json:
+                    clean_token = res_json['token']
+                    print(f"{Fore.GREEN}[+] Token successfully obtained from Session_id!")
+                else:
+                    print(f"{Fore.YELLOW}[!] Session_id accepted but token not found in response.")
+            else:
+                print(f"{Fore.RED}[!] Session exchange failed (HTTP {r.status_code}). Session might be invalid or expired.")
             
         client = Client(clean_token).init()
         # Save working token if it was transformed from Session_id
