@@ -53,11 +53,11 @@ LANG_DATA = {
         "compat": f"{Fore.CYAN}(Formatted for Migratify Compatibility)",
         "auth_title": "YANDEX MUSIC AUTHORIZATION",
         "need_token": "To work, the script needs your personal Yandex token.",
-        "how_to_get": "Method 1: Open https://music.yandex.ru/api/v2.1/token and copy 'token'.",
-        "step1": "Method 2: If Method 1 fails, go to music.yandex.ru -> F12 -> Application -> Cookies.",
-        "step2": "Find 'Session_id' and copy its value.",
-        "step3": "Paste either Token or Session_id below.",
-        "enter_token": "Paste Token or Session_id: ",
+        "how_to_get": "1. ALL unofficial extensions are blocked by Yandex. Use this official method:",
+        "step1": "2. Go to: https://oauth.yandex.ru/authorize?response_type=token&client_id=23cabbbdc6cd418abb4b39c32c41195d",
+        "step2": "3. Click 'Allow'. It will redirect you to a blank or 'Not Found' page - THIS IS NORMAL.",
+        "step3": "4. Copy the long text from the address bar AFTER 'access_token=' and BEFORE '&'.",
+        "enter_token": "Paste your Token here: ",
         "token_err": "Error: You didn't enter a token. Script cannot continue.",
         "token_saved": "Token saved to '{0}' for future runs.",
         "auth_err": "Authorization Error: {0}\nToken might be invalid or expired.",
@@ -82,11 +82,11 @@ LANG_DATA = {
         "compat": f"{Fore.CYAN}(Оптимизировано для работы с Migratify)",
         "auth_title": "АВТОРИЗАЦИЯ ЯНДЕКС МУЗЫКИ",
         "need_token": "Для работы скрипта нужен ваш персональный токен.",
-        "how_to_get": "Способ 1: Открой https://music.yandex.ru/api/v2.1/token и скопируй 'token'.",
-        "step1": "Способ 2: Если первый не сработал, зайди на music.yandex.ru -> F12 -> Application -> Cookies.",
-        "step2": "Найди 'Session_id' и скопируй его значение.",
-        "step3": "Вставь сюда либо Токен, либо Session_id.",
-        "enter_token": "Вставьте Токен или Session_id: ",
+        "how_to_get": "1. Яндекс удалил все расширения и ботов из-за авторских прав. Используем официальный метод:",
+        "step1": "2. Перейди по ссылке: https://oauth.yandex.ru/authorize?response_type=token&client_id=23cabbbdc6cd418abb4b39c32c41195d",
+        "step2": "3. Нажми 'Разрешить'. Тебя перекинет на пустую страницу или ошибку - ЭТО НОРМАЛЬНО.",
+        "step3": "4. Скопируй из адресной строки текст ПОСЛЕ 'access_token=' и ДО знака '&'.",
+        "enter_token": "Вставь сюда твой Токен: ",
         "token_err": "Ошибка: Вы не ввели токен. Работа скрипта невозможна.",
         "token_saved": "Токен сохранен в '{0}' для будущих запусков.",
         "auth_err": "Ошибка авторизации: {0}\nСкорее всего, токен неверный или устарел.",
@@ -158,8 +158,12 @@ def get_client(t) -> Client:
     
     # Try using as token first
     try:
-        # Clean token
+        # Clean token (handle full URLs or trailing parameters)
         clean_token = token.replace('OAuth ', '').strip().strip('"').strip("'")
+        if "access_token=" in clean_token:
+            clean_token = clean_token.split("access_token=")[-1]
+        if "&" in clean_token:
+            clean_token = clean_token.split("&")[0]
         if ":" in clean_token and len(clean_token) > 50: # Likely a Session_id
             print(f"{Fore.CYAN}[Wait] Attempting to exchange Session_id for Token...")
             headers = {
@@ -214,18 +218,18 @@ def save_to_csv(tracks: List[Track], output_file: str, t):
 
     print(f"\n{Fore.CYAN}{t['loading'].format(len(tracks))}")
 
-    try:
-        full_tracks = tracks.fetch_tracks() if hasattr(tracks, 'fetch_tracks') else tracks
-    except Exception:
-        full_tracks = tracks
-
     with open(clean_filename, 'w', newline='', encoding='utf-8-sig') as f:
         writer = csv.writer(f)
         writer.writerow(['Track Name', 'Artist Name(s)', 'Album', 'Track Duration (ms)'])
 
-        for track in tqdm(full_tracks, desc="Export", colour="yellow"):
+        for track in tqdm(tracks, desc="Export", colour="yellow"):
             if track:
-                writer.writerow(format_track(track))
+                try:
+                    writer.writerow(format_track(track))
+                except AttributeError:
+                    # In case a short track slips through, fetch it individually
+                    if hasattr(track, 'fetch_track'):
+                        writer.writerow(format_track(track.fetch_track()))
 
     print(f"\n{Fore.GREEN}✅ {t['done'].format(clean_filename)}")
     print(f"{Fore.YELLOW}💡 {t['tip']}")
@@ -251,7 +255,24 @@ def export_menu(client: Client, t):
 
     if choice == "1":
         likes = client.users_likes_tracks()
-        save_to_csv(likes.tracks, "library.csv", t)
+        
+        # Batch fetch all full tracks from TrackShort IDs
+        print(f"\n{Fore.CYAN}Fetching complete track metadata for your likes...")
+        track_ids = []
+        for tr in likes.tracks:
+            # Handle different versions of the library (id vs track_id)
+            tid = getattr(tr, 'id', getattr(tr, 'track_id', None))
+            if tid:
+                track_ids.append(tid)
+                
+        full_tracks = []
+        # Fetch in chunks of 400 to avoid rate limits / long request sizes
+        for i in tqdm(range(0, len(track_ids), 400), desc="Downloading info", colour="blue"):
+            chunk = track_ids[i:i+400]
+            if chunk:
+                full_tracks.extend(client.tracks(chunk))
+                
+        save_to_csv(full_tracks, "library.csv", t)
 
     elif choice == "2":
         playlists = client.users_playlists_list()

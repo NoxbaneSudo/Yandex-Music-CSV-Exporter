@@ -27,11 +27,11 @@
 
 ## 🔑 Шаг 1: Получение токена
 
-Для доступа к вашей библиотеке скрипту нужен ваш OAuth токен:
-1. Откройте **music.yandex.ru** в браузере и войдите в аккаунт.
-2. Перейдите по ссылке: [https://music.yandex.ru/api/v2.1/token](https://music.yandex.ru/api/v2.1/token)
-3. Скопируйте значение поля `token`.
-4. Вставьте его в терминал и нажмите **Enter**.
+Для доступа к вашей библиотеке скрипту нужен ваш токен. Самый надежный способ:
+1. Яндекс удалил все расширения и ботов из-за авторских прав. Используем официальный метод:
+2. Перейдите по ссылке: [https://oauth.yandex.ru/authorize?response_type=token&client_id=23cabbbdc6cd418abb4b39c32c41195d](https://oauth.yandex.ru/authorize?response_type=token&client_id=23cabbbdc6cd418abb4b39c32c41195d)
+3. Нажми **"Разрешить"**. Тебя перекинет на пустую страницу или выдаст ошибку - **ЭТО НОРМАЛЬНО**.
+4. Скопируй из адресной строки текст ПОСЛЕ `access_token=` и ДО знака `&`.
 
 ---
 
@@ -72,9 +72,9 @@ A simple and efficient tool to export your **Yandex Music** library to a univers
    * 🐧 Linux / 🍎 Mac: Run `run.sh` in terminal
 
 ## 🔑 Step 1: Authorization
-1. Open **music.yandex.ru** in your browser and log in.
-2. Go to: [https://music.yandex.ru/api/v2.1/token](https://music.yandex.ru/api/v2.1/token)
-3. Copy the value of the `token` field.
+1. Yandex blocked unofficial extensions/bots. Use the official link: [Go to Yandex OAuth](https://oauth.yandex.ru/authorize?response_type=token&client_id=23cabbbdc6cd418abb4b39c32c41195d)
+2. Click **"Allow"**. You will be redirected to a blank page or error - **THIS IS NORMAL**.
+3. Copy the long token string from your address bar (AFTER `access_token=` and BEFORE `&`).
 4. Paste it into the script window and press **Enter**.
 
 ## 🏎️ Step 2: Export
