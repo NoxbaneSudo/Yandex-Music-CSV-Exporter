@@ -1,0 +1,21 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+env/
+.venv/
+
+# Личные токены (Файлы с вашим секретным кодом)
+token.txt
+.env
+
+# Результаты работы (таблицы)
+yandex_likes.csv
+playlist_*.csv
+
+# Настройки IDE
+.vscode/
+.idea/
+*.swp
+*.swo
