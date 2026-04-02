@@ -1,0 +1,34 @@
+name: Build and Release ZIP
+
+on:
+  push:
+    tags:
+      - 'v*' # Trigger on tags starting with 'v' (e.g. v1.0.0)
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Create ZIP Archive
+        run: |
+          # Create zip excluding secrets, git artifacts, and temp folders
+          zip -r Yandex-Music-CSV-Exporter.zip . -x "*.git*" "token.txt" ".github*" ".venv*" "__pycache__*" "*.csv" "progress.json" ".gitignore" "yooo.md"
+
+      - name: Create GitHub Release
+        id: create_release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: Yandex-Music-CSV-Exporter.zip
+          draft: false
+          prerelease: false
+          body: "📢 New release of Yandex Music CSV Exporter (Yepdex)!"
+          tag_name: ${{ github.ref_name }}
+          name: Release ${{ github.ref_name }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
