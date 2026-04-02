@@ -4,7 +4,7 @@ import subprocess
 import os
 import time
 
-REQUIRED = ["yandex-music", "colorama", "tqdm"]
+REQUIRED = ["yandex-music", "colorama", "tqdm", "requests"]
 
 def _ensure_deps():
     import importlib
@@ -53,11 +53,11 @@ LANG_DATA = {
         "compat": f"{Fore.CYAN}(Formatted for Migratify Compatibility)",
         "auth_title": "YANDEX MUSIC AUTHORIZATION",
         "need_token": "To work, the script needs your personal Yandex token.",
-        "how_to_get": "How to get it:",
-        "step1": "1. Go to: https://clck.ru/34Y6vV",
-        "step2": "2. Click 'Allow'.",
-        "step3": "3. Copy the text from address bar after 'access_token='.",
-        "enter_token": "Paste your token here: ",
+        "how_to_get": "Method 1: Open https://music.yandex.ru/api/v2.1/token and copy 'token'.",
+        "step1": "Method 2: If Method 1 fails, go to music.yandex.ru -> F12 -> Application -> Cookies.",
+        "step2": "Find 'Session_id' and copy its value.",
+        "step3": "Paste either Token or Session_id below.",
+        "enter_token": "Paste Token or Session_id: ",
         "token_err": "Error: You didn't enter a token. Script cannot continue.",
         "token_saved": "Token saved to '{0}' for future runs.",
         "auth_err": "Authorization Error: {0}\nToken might be invalid or expired.",
@@ -82,11 +82,11 @@ LANG_DATA = {
         "compat": f"{Fore.CYAN}(Оптимизировано для работы с Migratify)",
         "auth_title": "АВТОРИЗАЦИЯ ЯНДЕКС МУЗЫКИ",
         "need_token": "Для работы скрипта нужен ваш персональный токен.",
-        "how_to_get": "Как его получить:",
-        "step1": "1. Перейдите по ссылке: https://clck.ru/34Y6vV",
-        "step2": "2. Нажмите кнопку 'Разрешить'.",
-        "step3": "3. Скопируйте текст из адресной строки после 'access_token='.",
-        "enter_token": "Вставьте ваш токен здесь: ",
+        "how_to_get": "Способ 1: Открой https://music.yandex.ru/api/v2.1/token и скопируй 'token'.",
+        "step1": "Способ 2: Если первый не сработал, зайди на music.yandex.ru -> F12 -> Application -> Cookies.",
+        "step2": "Найди 'Session_id' и скопируй его значение.",
+        "step3": "Вставь сюда либо Токен, либо Session_id.",
+        "enter_token": "Вставьте Токен или Session_id: ",
         "token_err": "Ошибка: Вы не ввели токен. Работа скрипта невозможна.",
         "token_saved": "Токен сохранен в '{0}' для будущих запусков.",
         "auth_err": "Ошибка авторизации: {0}\nСкорее всего, токен неверный или устарел.",
@@ -135,7 +135,7 @@ def get_token(t) -> str:
     print("=" * 45)
     print(f"\n{t['need_token']}")
     print(t['how_to_get'])
-    print(f"{t['step1']}")
+    print(t['step1'])
     print(t['step2'])
     print(t['step3'])
     print("\n" + "-" * 45)
@@ -153,14 +153,31 @@ def get_token(t) -> str:
     return token
 
 def get_client(t) -> Client:
+    import requests
     token = get_token(t)
+    
+    # Try using as token first
     try:
-        client = Client(token).init()
+        # Clean token
+        clean_token = token.replace('OAuth ', '').strip().strip('"').strip("'")
+        if ":" in clean_token and len(clean_token) > 50: # Likely a Session_id
+            print(f"{Fore.CYAN}[Wait] Attempting to exchange Session_id for Token...")
+            r = requests.get('https://music.yandex.ru/api/v2.1/token', cookies={'Session_id': clean_token})
+            if r.status_code == 200:
+                clean_token = r.json().get('token', clean_token)
+            
+        client = Client(clean_token).init()
+        # Save working token if it was transformed from Session_id
+        if clean_token != token:
+             with open(TOKEN_FILE, "w", encoding="utf-8") as f:
+                f.write(clean_token)
         return client
     except Exception as e:
         print(f"\n{Fore.RED}[!] {t['auth_err'].format(e)}")
         if os.path.exists(TOKEN_FILE):
             os.remove(TOKEN_FILE)
+        print(f"\n{Fore.WHITE}Press Enter to exit...{Style.RESET_ALL}")
+        input()
         sys.exit(1)
 
 def format_track(track: Track) -> List[str]:

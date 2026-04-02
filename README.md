@@ -27,10 +27,10 @@
 
 ## 🔑 Шаг 1: Получение токена
 
-Для доступа к вашей библиотеке скрипту нужен токен:
-1. Перейдите по ссылке (она будет в окне скрипта): [https://clck.ru/34Y6vV](https://clck.ru/34Y6vV)
-2. Нажмите **"Разрешить"**.
-3. Скопируйте текст из адресной строки после `access_token=`.
+Для доступа к вашей библиотеке скрипту нужен ваш OAuth токен:
+1. Откройте **music.yandex.ru** в браузере и войдите в аккаунт.
+2. Перейдите по ссылке: [https://music.yandex.ru/api/v2.1/token](https://music.yandex.ru/api/v2.1/token)
+3. Скопируйте значение поля `token`.
 4. Вставьте его в терминал и нажмите **Enter**.
 
 ---
@@ -72,10 +72,10 @@ A simple and efficient tool to export your **Yandex Music** library to a univers
    * 🐧 Linux / 🍎 Mac: Run `run.sh` in terminal
 
 ## 🔑 Step 1: Authorization
-1. Follow the auth link provided in the script.
-2. Click **"Allow"**.
-3. Copy the token from your browser address bar (everything after `access_token=`).
-4. Paste it into the script window.
+1. Open **music.yandex.ru** in your browser and log in.
+2. Go to: [https://music.yandex.ru/api/v2.1/token](https://music.yandex.ru/api/v2.1/token)
+3. Copy the value of the `token` field.
+4. Paste it into the script window and press **Enter**.
 
 ## 🏎️ Step 2: Export
 1. Select "Liked Songs" or a specific playlist in the menu.
