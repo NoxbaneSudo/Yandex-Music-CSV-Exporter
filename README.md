@@ -1,83 +1,99 @@
-# Yepdex Music 🇷🇺 / 🇬🇧
+# Yepdex Music
 
-*[🇬🇧 English version below](#-english-version)*
+Небольшой Python-экспортёр библиотеки **Яндекс Музыки** в CSV.
 
-Удобный инструмент для экспорта вашей музыкальной библиотеки из **Яндекс Музыки** в универсальный формат `.csv`. Создан как идеальный компаньон для **Migratify** — выгруженные файлы полностью совместимы и готовы к переносу в YouTube Music.
+Файл из «Любимых треков» сохраняется как `library.csv` и сразу подходит для [Migratify](https://github.com/NoxbaneSudo/Migratify): можно перенести библиотеку в YouTube Music.
 
-## 🚀 Особенности
+[English version](#english-version)
 
-* **Авто-установка зависимостей**: Просто запустите скрипт, он сам установит нужные библиотеки Python.
-* **Умная выгрузка**: Сохраняет не только названия, но и точную длительность треков в миллисекундах (для идеального поиска в Migratify).
-* **Поддержка плейлистов**: Выгружайте как "Любимые треки", так и любые свои плейлисты.
-* **Запоминание токена**: Вам не придется вводить данные при каждом запуске.
-* **Кроссплатформенность**: Работает на Windows, Linux и macOS.
+## Что умеет
+
+- экспортировать «Любимые треки»;
+- экспортировать любой ваш плейлист;
+- сохранять название, исполнителя, альбом и длительность трека;
+- автоматически устанавливать нужные Python-пакеты при первом запуске;
+- работать на Windows, Linux и macOS.
+
+## Запуск
+
+Нужен [Python 3.8+](https://www.python.org/downloads/).
+
+1. Скачайте или клонируйте репозиторий.
+2. Запустите файл для своей системы:
+
+| Система | Запуск |
+| --- | --- |
+| Windows | Дважды кликните `run.bat` |
+| Linux / macOS | В терминале выполните `chmod +x run.sh && ./run.sh` |
+
+При первом запуске скрипт сам установит зависимости.
+
+## Получите токен Яндекса
+
+Токен нужен только для доступа к вашей библиотеке.
+
+1. Откройте [страницу авторизации Яндекса](https://oauth.yandex.ru/authorize?response_type=token&client_id=23cabbbdc6cd418abb4b39c32c41195d).
+2. Нажмите **«Разрешить»**.
+3. Вас может открыть на пустой странице или странице с ошибкой — это нормально.
+4. В адресной строке скопируйте текст после `access_token=` и до первого `&`.
+5. При первом запуске вставьте токен в окно скрипта.
+
+Токен сохраняется локально в `token.txt`, чтобы не вводить его каждый раз. Не передавайте этот файл другим людям. Он уже добавлен в `.gitignore`.
+
+## Экспорт
+
+После авторизации выберите в меню:
+
+- `1` — экспорт «Любимых треков» в `library.csv`;
+- `2` — выберите свой плейлист; файл будет создан с его названием.
+
+CSV содержит столбцы `Track Name`, `Artist Name(s)`, `Album` и `Track Duration (ms)`.
+
+## Перенос в YouTube Music
+
+Для «Любимых треков» ничего переименовывать не нужно: скопируйте `library.csv` в папку [Migratify](https://github.com/NoxbaneSudo/Migratify) и запустите миграцию по его инструкции.
+
+## Благодарности
+
+- [yandex-music-python](https://github.com/MarshalX/yandex-music-python) — библиотека для API Яндекс Музыки.
+- _d1naxu_ — идея и вдохновение.
 
 ---
 
-## 📥 Установка и запуск
+# English version
 
-**Требования:** Установленный [Python 3.8+](https://www.python.org/downloads/).
+Yepdex Music is a small Python tool that exports your **Yandex Music** library to CSV.
 
-1. Скачайте этот репозиторий.
-2. Запустите лаунчер в папке проекта:
-   * 🪟 Windows: `run.bat`
-   * 🐧 Linux / 🍎 Mac: `run.sh`
+Exports of liked tracks are saved as `library.csv`, ready to use with [Migratify](https://github.com/NoxbaneSudo/Migratify) for a YouTube Music migration.
 
----
+## Features
 
-## 🔑 Шаг 1: Получение токена
+- Export liked tracks or any of your playlists.
+- Save track title, artist, album, and duration.
+- Install required Python packages automatically on the first run.
+- Run on Windows, Linux, and macOS.
 
-Для доступа к вашей библиотеке скрипту нужен ваш токен. Самый надежный способ:
-1. Яндекс удалил все расширения и ботов из-за авторских прав. Используем официальный метод:
-2. Перейдите по ссылке: [https://oauth.yandex.ru/authorize?response_type=token&client_id=23cabbbdc6cd418abb4b39c32c41195d](https://oauth.yandex.ru/authorize?response_type=token&client_id=23cabbbdc6cd418abb4b39c32c41195d)
-3. Нажми **"Разрешить"**. Тебя перекинет на пустую страницу или выдаст ошибку - **ЭТО НОРМАЛЬНО**.
-4. Скопируй из адресной строки текст ПОСЛЕ `access_token=` и ДО знака `&`.
+## Run it
 
----
+You need [Python 3.8+](https://www.python.org/downloads/).
 
-## 🏎️ Шаг 2: Экспорт
+| System | How to run |
+| --- | --- |
+| Windows | Double-click `run.bat` |
+| Linux / macOS | Run `chmod +x run.sh && ./run.sh` in a terminal |
 
-1. Выберите в меню, что именно вы хотите выгрузить (Лайки или Плейлист).
-2. Скрипт создаст файл `library.csv` в папке проекта.
-3. **Готово!** Просто перенесите этот файл в папку с **Migratify** и запустите миграцию.
+## Get a Yandex token
 
----
+1. Open the [Yandex authorization page](https://oauth.yandex.ru/authorize?response_type=token&client_id=23cabbbdc6cd418abb4b39c32c41195d).
+2. Click **Allow**.
+3. A blank or error page is expected.
+4. Copy the value after `access_token=` and before the first `&` in the address bar.
+5. Paste it into the script when prompted.
 
-## 🤝 Благодарности (Acknowledgements)
+The token is saved locally to `token.txt`. Keep it private; the file is excluded from Git.
 
-* **[yandex-music-python](https://github.com/MarshalX/yandex-music-python)** — за отличную библиотеку для работы с API Яндекса.
-* **_d1naxu_** — за идею и вдохновение на создание этого скрипта!
+## Export and migrate
 
----
+Choose `1` to export liked tracks to `library.csv`, or `2` to export one playlist.
 
-# 🇬🇧 English Version
-
-A simple and efficient tool to export your **Yandex Music** library to a universal `.csv` format. Designed as the perfect companion for **Migratify** — exported files are 100% compatible and ready for migration to YouTube Music.
-
-## 🚀 Features
-
-* **Auto-install dependencies**: Just run the script, and it handles Python libraries automatically.
-* **Smart Export**: Saves track names, artists, and exact duration in ms (for perfect Smart Search in Migratify).
-* **Playlist Support**: Export your "Liked Songs" or any custom playlist.
-* **Persistent Auth**: Your token is saved securely for future sessions.
-* **Cross-platform**: Native support for Windows, Linux, and macOS.
-
-## 📥 Quick Start
-
-**Requirement:** [Python 3.8+](https://www.python.org/downloads/) installed.
-
-1. Download or clone this repository.
-2. Launch the script:
-   * 🪟 Windows: Double-click `run.bat`
-   * 🐧 Linux / 🍎 Mac: Run `run.sh` in terminal
-
-## 🔑 Step 1: Authorization
-1. Yandex blocked unofficial extensions/bots. Use the official link: [Go to Yandex OAuth](https://oauth.yandex.ru/authorize?response_type=token&client_id=23cabbbdc6cd418abb4b39c32c41195d)
-2. Click **"Allow"**. You will be redirected to a blank page or error - **THIS IS NORMAL**.
-3. Copy the long token string from your address bar (AFTER `access_token=` and BEFORE `&`).
-4. Paste it into the script window and press **Enter**.
-
-## 🏎️ Step 2: Export
-1. Select "Liked Songs" or a specific playlist in the menu.
-2. The script will generate a `library.csv` file.
-3. **Done!** Move this file to your **Migratify** folder and start your migration to YouTube Music.
+To migrate liked tracks, copy `library.csv` into the [Migratify](https://github.com/NoxbaneSudo/Migratify) folder and follow its instructions.
